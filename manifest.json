@@ -9,6 +9,12 @@
   "icons": {
     "128": "icon128.png"
   },
-  "permissions": ["tabs"],
-  "host_permissions": ["https://*/*", "http://*/*"]
+  "permissions": ["tabs", "storage"],
+  "host_permissions": ["https://*/*", "http://*/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "icon128.png"
+    }
+  }
 }

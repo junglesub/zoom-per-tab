@@ -1,12 +1,22 @@
-// 화이트리스트 도메인 배열
-const whitelist = ["https://github.com"];
-
+// Apply zoom settings only if the domain is in the whitelist and the extension is enabled
 chrome.tabs.onZoomChange.addListener((zoomChangeInfo) => {
-  chrome.tabs.get(zoomChangeInfo.tabId, (tab) => {
-    if (!tab || !tab.url) return;
-    // whitelist에 포함된 도메인으로 시작하는지 확인
-    if (whitelist.some((domain) => tab.url.startsWith(domain))) {
-      chrome.tabs.setZoomSettings(zoomChangeInfo.tabId, { scope: "per-tab" });
-    }
+  chrome.storage.sync.get(["whitelist", "enabled"], (data) => {
+    const enabled = data.enabled !== false; // Default: true
+    if (!enabled) return;
+    chrome.tabs.get(zoomChangeInfo.tabId, (tab) => {
+      if (!tab || !tab.url) return;
+      const urlOrigin = (() => {
+        try {
+          return new URL(tab.url).origin;
+        } catch {
+          return null;
+        }
+      })();
+      if (!urlOrigin) return;
+      const whitelist = data.whitelist || [];
+      if (whitelist.includes(urlOrigin)) {
+        chrome.tabs.setZoomSettings(zoomChangeInfo.tabId, { scope: "per-tab" });
+      }
+    });
   });
 });
